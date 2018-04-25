@@ -26,6 +26,24 @@ def filter_pkgs(pkgs, patterns):
     return result
 
 
+def filter_subpkgs(pkgs, patterns):
+    """ Filter a list of subpackages according patterns
+
+    Args:
+        pkgs (list): List of subpackages to filter
+        patterns (list): List of patterns
+
+    Returns:
+        set: a filtered set of package
+    """
+    result = set()
+    for pattern in patterns:
+        regex = re.compile(r"^{}$".format(pattern))
+        result |= {pkg for pkg in pkgs if regex.match(pkg.name)}
+
+    return result
+
+
 def download_packages(url, destdir):
     """ direct packages download utility
 

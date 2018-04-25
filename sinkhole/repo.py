@@ -13,7 +13,7 @@ from six.moves import configparser
 import yaml
 
 from sinkhole.config import Config
-from sinkhole.util import (download_packages, filter_pkgs)
+from sinkhole.util import (download_packages, filter_pkgs, filter_subpkgs)
 
 if six.PY2:
     # ConfigParser.read_string has been added in Python 3.2
@@ -158,6 +158,6 @@ class Reposync(object):
         included = set(pkgs) if not self.include_pkgs else \
             filter_pkgs(pkgs, self.include_pkgs)
         excluded = set() if not self.exclude_pkgs else \
-            filter_pkgs(pkgs, self.exclude_pkgs)
+            filter_subpkgs(pkgs, self.exclude_pkgs)
         pkgs = list(included - excluded)
         return pkgs

@@ -8,7 +8,7 @@ import six
 import yaml
 
 from sinkhole.config import Config
-from sinkhole.util import download_packages
+from sinkhole.util import (download_packages, filter_subpkgs)
 
 # Dict to define RPM arches associated with each basearch.
 ARCHES_DICT = {'x86_64': ['noarch', 'i686', 'x86_64']}
@@ -35,13 +35,14 @@ def setup_kojiclient(profile):
 class KojiDownloader(object):
     """ Download builds from koji
     """
-    def __init__(self, profile, builds=None):
+    def __init__(self, profile, builds=None, exclude=None):
         self.profile = profile
         self.koji = setup_kojiclient(self.profile)
         self._builds = self.builds(builds)
         self._config = Config()
         basearch = self._config.default_substitutions["basearch"]
         self._arches = ARCHES_DICT[basearch]
+        self._exclude = exclude
 
     def builds(self, builds_):
         """ Defines builds to be downloaded
@@ -82,8 +83,9 @@ class KojiDownloader(object):
         with open(constraints_file, "r") as cfile:
             constraints = yaml.load(cfile, Loader=yaml.Loader)
             builds = constraints["builds"]
+            exclude = constraints["exclude"]
 
-        kojid = cls(profile, builds)
+        kojid = cls(profile, builds, exclude)
         return kojid
 
     def run(self):
@@ -95,10 +97,13 @@ class KojiDownloader(object):
             try:
                 info = self.koji.getBuild(build)
                 rpms = self.koji.listRPMs(buildID=info['id'],
-                                          arches=self._arches)
-                fnames = [pathinfo.rpm(rpm) for rpm in rpms]
+                                      arches=self._arches)
+                fnames = []
+                for rpm in rpms:
+                    if not filter_subpkgs([rpm], self._exclude):
+                        fnames.append(pathinfo.rpm(rpm))
                 urls += [pathinfo.build(info) + '/' + fname
-                         for fname in fnames]
+                        for fname in fnames]
             except Exception:
                 print('SKIPPED: build {} does not exists'.format(build))
         for url in urls:

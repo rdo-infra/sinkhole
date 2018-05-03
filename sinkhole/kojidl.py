@@ -77,8 +77,9 @@ class KojiDownloader(object):
         with open(constraints_file, "r") as cfile:
             constraints = yaml.load(cfile, Loader=yaml.Loader)
             builds = constraints["builds"]
+            arches = constraints["arches"]
 
-        kojid = cls(profile, builds)
+        kojid = cls(profile, builds, arches)
         return kojid
 
     def run(self):

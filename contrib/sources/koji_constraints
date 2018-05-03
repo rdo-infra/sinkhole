@@ -2,3 +2,9 @@
 builds:
   - hwdata-0.311-1.fc26
   - weston@latest
+
+arches:
+  - noarch
+  - i686
+  - x86_64
+

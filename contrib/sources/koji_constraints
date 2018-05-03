@@ -1,10 +1,7 @@
 ---
 builds:
-  - hwdata-0.311-1.fc26
+  - python-sphinx-1.6.5-2.fc28
   - weston@latest
 
-arches:
-  - noarch
-  - i686
-  - x86_64
-
+exclude:
+  - python-sphinx-latex

@@ -3,6 +3,7 @@
 
 from functools import partial
 from multiprocessing import Pool
+import errno
 import os
 import shutil
 
@@ -121,9 +122,12 @@ class Reposync(object):
         download_pkgs = [pkg.remote_location() for pkg in download_pkgs]
 
         config = Config()
+        packages_dir = os.path.join(config.output_dir, "Packages")
+        if not os.path.exists(packages_dir):
+            os.makedirs(packages_dir)
         with Pool(config.workers) as pool:
             pool.map(partial(download_packages,
-                             destdir=config.output_dir),
+                             destdir=packages_dir),
                      download_pkgs)
         # 3161
         # sinkhole --repofile fedora.repo --destdir tmp2

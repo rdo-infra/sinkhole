@@ -16,12 +16,12 @@ def filter_pkgs(pkgs, patterns):
         patterns (list): List of patterns
 
     Returns:
-        set: a filtered set of package
+        list: a filtered list of packages
     """
-    result = set()
+    result = []
     for pattern in patterns:
         regex = re.compile(r"^{}$".format(pattern))
-        result |= {pkg for pkg in pkgs if regex.match(pkg.source_name)}
+        result = [pkg for pkg in pkgs if regex.match(pkg.source_name)]
 
     return result
 
@@ -34,12 +34,18 @@ def filter_subpkgs(pkgs, patterns):
         patterns (list): List of patterns
 
     Returns:
-        set: a filtered set of package
+        list: a filtered list of packages
     """
-    result = set()
+    result = []
     for pattern in patterns:
         regex = re.compile(r"^{}$".format(pattern))
-        result |= {pkg for pkg in pkgs if regex.match(pkg.name)}
+        for pkg in pkgs:
+            if type(pkg) == dict:
+                pkg_name = pkg['name']
+            else:
+                pkg_name = pkg.name
+            if regex.match(pkg_name):
+                result.append(pkg)
 
     return result
 

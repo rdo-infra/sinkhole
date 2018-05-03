@@ -8,7 +8,7 @@ import six
 import yaml
 
 from sinkhole.config import Config
-from sinkhole.util import download_packages
+from sinkhole.util import (download_packages, filter_subpkgs)
 
 
 def setup_kojiclient(profile):
@@ -32,11 +32,12 @@ def setup_kojiclient(profile):
 class KojiDownloader(object):
     """ Download builds from koji
     """
-    def __init__(self, profile, builds=None, arches=None):
+    def __init__(self, profile, builds=None, arches=None, exclude=None):
         self.profile = profile
         self.koji = setup_kojiclient(self.profile)
         self._arches = arches
         self._builds = self.builds(builds)
+        self._exclude = exclude
 
     def builds(self, builds_):
         """ Defines builds to be downloaded
@@ -78,8 +79,9 @@ class KojiDownloader(object):
             constraints = yaml.load(cfile, Loader=yaml.Loader)
             builds = constraints["builds"]
             arches = constraints["arches"]
+            exclude = constraints["exclude"]
 
-        kojid = cls(profile, builds, arches)
+        kojid = cls(profile, builds, arches, exclude)
         return kojid
 
     def run(self):
@@ -92,11 +94,14 @@ class KojiDownloader(object):
             try:
                 info = self.koji.getBuild(build)
                 rpms = self.koji.listRPMs(buildID=info['id'],
-                                          arches=self._arches)
-                fnames = [pathinfo.rpm(rpm) for rpm in rpms]
+                                      arches=self._arches)
+                fnames = []
+                for rpm in rpms:
+                    if not filter_subpkgs([rpm], self._exclude):
+                        fnames.append(pathinfo.rpm(rpm))
                 urls += [pathinfo.build(info) + '/' + fname
-                         for fname in fnames]
-            except Exception:
+                        for fname in fnames]
+            except Exception as e:
                 print('SKIPPED: build {} does not exists'.format(build))
         for url in urls:
             download_packages(url, config.output_dir)

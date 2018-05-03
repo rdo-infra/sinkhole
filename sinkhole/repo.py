@@ -155,9 +155,9 @@ class Reposync(object):
         Returns:
             list: packages to download
         """
-        included = set(pkgs) if not self.include_pkgs else \
+        included = pkgs if not self.include_pkgs else \
             filter_subpkgs(pkgs, self.include_pkgs)
-        excluded = set() if not self.exclude_pkgs else \
+        excluded = [] if not self.exclude_pkgs else \
             filter_subpkgs(pkgs, self.exclude_pkgs)
-        pkgs = list(included - excluded)
+        pkgs = [item for item in included if item not in excluded]
         return pkgs

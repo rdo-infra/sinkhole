@@ -1,7 +1,8 @@
 """ Koji interaction
 """
 
-import os.path
+import errno
+import os
 
 import koji
 import six
@@ -106,5 +107,11 @@ class KojiDownloader(object):
                         for fname in fnames]
             except Exception:
                 print('SKIPPED: build {} does not exists'.format(build))
+        packages_dir = os.path.join(self._config.output_dir, "Packages")
+        try:
+            os.makedirs(packages_dir)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
         for url in urls:
-            download_packages(url, self._config.output_dir)
+            download_packages(url, packages_dir)

@@ -10,6 +10,9 @@ import yaml
 from sinkhole.config import Config
 from sinkhole.util import download_packages
 
+# Dict to define RPM arches associated with each basearch.
+ARCHES_DICT = {'x86_64': ['noarch', 'i686', 'x86_64']}
+
 
 def setup_kojiclient(profile):
     """Setup koji client session
@@ -32,11 +35,13 @@ def setup_kojiclient(profile):
 class KojiDownloader(object):
     """ Download builds from koji
     """
-    def __init__(self, profile, builds=None, arches=None):
+    def __init__(self, profile, builds=None):
         self.profile = profile
         self.koji = setup_kojiclient(self.profile)
-        self._arches = arches
         self._builds = self.builds(builds)
+        self._config = Config()
+        basearch = self._config.default_substitutions['basearch']
+        self._arches = ARCHES_DICT[basearch]
 
     def builds(self, builds_):
         """ Defines builds to be downloaded
@@ -86,7 +91,6 @@ class KojiDownloader(object):
         """
         urls = []
         pathinfo = koji.PathInfo(topdir=self.koji.opts['topurl'])
-        config = Config()
         for build in self._builds:
             try:
                 info = self.koji.getBuild(build)
@@ -98,4 +102,4 @@ class KojiDownloader(object):
             except Exception:
                 print('SKIPPED: build {} does not exists'.format(build))
         for url in urls:
-            download_packages(url, config.output_dir)
+            download_packages(url, self._config.output_dir)

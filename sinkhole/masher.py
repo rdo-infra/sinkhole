@@ -12,11 +12,13 @@ except ImportError:
 class RepoMasher(object):
     """ Generate RPM repository metadata
     """
-    def __init__(self, destdir):
+    def __init__(self, destdir, revision=None):
         self.destdir = destdir
         config = Config()
         opts = config.masher_opts
         workers = config.masher_workers
+        if revision:
+            opts = "%s --revision %s" % (opts, revision)
         self.createrepo = createrepo.bake(*opts.split(), workers=workers)
 
     def run(self):

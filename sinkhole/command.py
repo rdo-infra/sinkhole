@@ -18,6 +18,7 @@ def main():
     # top-level parser
     parser = argparse.ArgumentParser(description="sinkhole")
     parser.add_argument("--config", action="store")
+    parser.add_argument("--revision", action="store")
     subparsers = parser.add_subparsers(dest="subcommand")
 
     # reposync
@@ -57,7 +58,7 @@ def main():
         sources = SourceBuilder.build()
         for source in sources:
             source.run()
-        rm = RepoMasher(config.output_dir)
+        rm = RepoMasher(config.output_dir, revision=args.revision)
         rm.run()
 
 

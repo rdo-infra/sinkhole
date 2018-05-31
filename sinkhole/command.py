@@ -4,6 +4,7 @@
 """
 
 import argparse
+import sys
 
 from sinkhole.config import Config
 from sinkhole.kojidl import KojiDownloader
@@ -17,7 +18,6 @@ def main():
     """
     # top-level parser
     parser = argparse.ArgumentParser(description="sinkhole")
-    parser.add_argument("--config", action="store")
     parser.add_argument("--revision", action="store")
     subparsers = parser.add_subparsers(dest="subcommand")
 
@@ -40,6 +40,17 @@ def main():
     parser_koji.add_argument("--builds", action="store", nargs="+",
                              required=True)
     parser_koji.add_argument("--destdir", action="store", required=True)
+
+    parser_config = subparsers.add_parser("config_file",
+                                          help="Use config file")
+    parser_config.add_argument("--config", action="store", required=True)
+
+    # argparse in python2 does not support optional subparsers. In order to
+    # maintain compatibility in cli for python 2 and 3, i'm implementing a
+    # default subcommand to 'config_file'.
+    arg1 = sys.argv[1]
+    if arg1 not in ['-h', '--help', 'reposync', 'kojidownload', 'config_file']:
+        sys.argv.insert(1, 'config_file')
 
     # Run appropriate command
     args = parser.parse_args()

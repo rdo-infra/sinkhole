@@ -125,10 +125,12 @@ class Reposync(object):
         packages_dir = os.path.join(config.output_dir, "Packages")
         if not os.path.exists(packages_dir):
             os.makedirs(packages_dir)
-        with Pool(config.workers) as pool:
-            pool.map(partial(download_packages,
-                             destdir=packages_dir),
-                     download_pkgs)
+        pool = Pool(config.workers)
+        pool.map(partial(download_packages,
+                         destdir=packages_dir),
+                 download_pkgs)
+        pool.close()
+        pool.join()
         # 3161
         # sinkhole --repofile fedora.repo --destdir tmp2
         # 699.75s user 195.08s system 14% cpu 1:41:17.52 total

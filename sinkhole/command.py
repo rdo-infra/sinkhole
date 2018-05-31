@@ -17,9 +17,9 @@ def main():
     """
     # top-level parser
     parser = argparse.ArgumentParser(description="sinkhole")
-    parser.add_argument("--config", action="store")
     parser.add_argument("--revision", action="store")
     subparsers = parser.add_subparsers(dest="subcommand")
+    subparsers.required = True
 
     # reposync
     parser_reposync = subparsers.add_parser("reposync",
@@ -40,6 +40,11 @@ def main():
     parser_koji.add_argument("--builds", action="store", nargs="+",
                              required=True)
     parser_koji.add_argument("--destdir", action="store", required=True)
+
+    # config_file
+    parser_config = subparsers.add_parser("config_file",
+                                          help="Use config file")
+    parser_config.add_argument("--config", action="store", required=True)
 
     # Run appropriate command
     args = parser.parse_args()

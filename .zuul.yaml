@@ -1,0 +1,6 @@
+- project:
+    name: rdo-infra/sinkhole
+    check:
+      jobs:
+        - legacy-fedora-sinkhole-functional
+        - legacy-centos-sinkhole-functional

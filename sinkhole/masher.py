@@ -3,10 +3,7 @@
 
 from sinkhole.config import Config
 
-try:
-    from sh import createrepo_c as createrepo
-except ImportError:
-    from sh import createrepo
+from sh import createrepo as createrepo
 
 
 class RepoMasher(object):

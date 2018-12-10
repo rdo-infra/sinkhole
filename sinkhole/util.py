@@ -41,9 +41,11 @@ def filter_subpkgs(pkgs, patterns):
         regex = re.compile(r"^{}$".format(pattern))
         for pkg in pkgs:
             if type(pkg) == dict:
-                pkg_name = pkg['name']
+                pkg_name = "{0[name]}-{0[version]}-{0[release]}.{0[arch]}".\
+                format(pkg)
             else:
-                pkg_name = pkg.name
+                pkg_name = "{0.name}-{0.version}-{0.release}.{0.arch}".\
+                format(pkg)
             if regex.match(pkg_name):
                 result.append(pkg)
 

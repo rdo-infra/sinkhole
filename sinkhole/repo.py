@@ -1,6 +1,7 @@
 """ RPM repositories management
 """
 
+from distutils.version import LooseVersion
 from functools import partial
 from multiprocessing import Pool
 import errno
@@ -8,7 +9,11 @@ import os
 import shutil
 
 import dnf
-from dnf.conf.parser import substitute
+# dnf 3.0.1 drops dnf.conf.parser module
+if LooseVersion(dnf.__version__) >= LooseVersion('3.0.1'):
+    substitute = lambda x,y: x
+else:
+    from dnf.conf.parser import substitute
 import six
 from six.moves import configparser
 import yaml

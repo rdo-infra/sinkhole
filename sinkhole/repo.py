@@ -4,6 +4,7 @@
 from distutils.version import LooseVersion
 from functools import partial
 from multiprocessing import Pool
+import errno
 import os
 import shutil
 
@@ -19,7 +20,6 @@ import yaml
 
 from sinkhole.config import Config
 from sinkhole.util import (download_packages, filter_pkgs, filter_subpkgs)
-
 
 if six.PY2:
     # ConfigParser.read_string has been added in Python 3.2

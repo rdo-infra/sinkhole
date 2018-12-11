@@ -1,6 +1,6 @@
 [main]
 workers = 8
-output_dir = latest
+output_dir = /tmp/latest
 releasever=28
 basearch=x86_64
 

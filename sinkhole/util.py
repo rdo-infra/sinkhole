@@ -38,14 +38,18 @@ def filter_subpkgs(pkgs, patterns):
     """
     result = []
     for pattern in patterns:
+        use_nvr = False
+        if pattern.startswith("nvr:"):
+            pattern = pattern.replace("nvr:", "")
+            use_nvr = True
         regex = re.compile(r"^{}$".format(pattern))
         for pkg in pkgs:
             if type(pkg) == dict:
                 pkg_name = "{0[name]}-{0[version]}-{0[release]}.{0[arch]}".\
-                format(pkg)
+                format(pkg) if use_nvr else pkg["name"]
             else:
                 pkg_name = "{0.name}-{0.version}-{0.release}.{0.arch}".\
-                format(pkg)
+                format(pkg) if use_nvr else pkg.name
             if regex.match(pkg_name):
                 result.append(pkg)
 

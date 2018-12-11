@@ -38,14 +38,23 @@ def filter_subpkgs(pkgs, patterns):
     """
     result = []
     for pattern in patterns:
+        use_nvr = False
+        if pattern.startswith("nvr:"):
+            pattern = pattern.replace("nvr:", "")
+            use_nvr = True
         regex = re.compile(r"^{}$".format(pattern))
         for pkg in pkgs:
             if type(pkg) == dict:
+                # TODO: set use_nvr to false if version/release/arch are not set
                 pkg_name = "{0[name]}-{0[version]}-{0[release]}.{0[arch]}".\
-                format(pkg)
+                format(pkg) if use_nvr else pkg["name"]
             else:
+                if not hasattr(pkg, "version") or \
+                   not hasattr(pkg, "release") or \
+                   not hasattr(pkg, "arch"):
+                    use_nvr = False
                 pkg_name = "{0.name}-{0.version}-{0.release}.{0.arch}".\
-                format(pkg)
+                format(pkg) if use_nvr else pkg.name
             if regex.match(pkg_name):
                 result.append(pkg)
 
